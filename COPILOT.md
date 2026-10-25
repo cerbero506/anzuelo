@@ -15,7 +15,8 @@ Plan utilizado: **GitHub Copilot Free**.
 
 | Lección del workshop | Estado | Motivo |
 |---|---|---|
-| 0 a 7 | Realizadas, adaptadas a Anzuelo | Disponibles en Free |
+| 0 a 4, 6 y 7 | Realizadas, adaptadas a Anzuelo | Disponibles en Free |
+| 5. Publicar el repositorio | **Sin Copilot** | El repositorio y su primer commit se crearon fuera de Copilot, con otro asistente de IA. En esta lección solo se clona y se vincula en la app de Copilot. |
 | 8. Revisión de PR | **Parcial** | Copilot Free no incluye Copilot code review en pull requests. Se hicieron los pasos 1-4 (crear el PR) y la revisión del diff fue manual, como indica el propio workshop. |
 | 9. Automatizaciones | Omitida si no está disponible | No es necesaria para la solución |
 | 10. Sesión remota | Omitida | Opcional en el workshop |
@@ -35,7 +36,11 @@ Explica con ejemplos qué es el typosquatting, el uso de punycode y el truco de 
 Evidencia: captura de la respuesta. Úsala para validar que las reglas de `analyzer.js` cubren esos casos.
 
 ### Lección 1. Crear la sesión
-Abre la carpeta `anzuelo` en una sesión **Interactive**. Verifica en el menú del título que la ruta es la correcta.
+Clona el repositorio y ábrelo en una sesión **Interactive**:
+```bash
+git clone https://github.com/cerbero506/anzuelo.git
+```
+Verifica en el menú del título que la ruta es la correcta y que el proyecto aparece vinculado a `cerbero506/anzuelo`.
 
 ### Lección 2. Entender y pulir
 1. Explicación del código:
@@ -68,10 +73,10 @@ Revisa el archivo generado y deja solo reglas reales de este proyecto, por ejemp
 - Todo cambio en `analyzer.js` lleva pruebas y `npm test` en verde.
 
 ### Lección 5. Publicar el repositorio
+El repositorio público ya existe (https://github.com/cerbero506/anzuelo), así que no se usa el prompt de publicación del workshop. Haz commit y push de los cambios de las lecciones 2 a 4 desde la sesión:
 ```
-Inicializa esta carpeta como repositorio Git, crea un commit inicial y crea un repositorio público llamado anzuelo en mi cuenta. Sube la rama actual como rama principal y vincula el proyecto en esta app.
+Crea un commit con los cambios de esta sesión con un mensaje descriptivo en español y súbelo a main.
 ```
-Confirma en GitHub que están `index.html`, `assets/`, `README.md` y este archivo.
 
 ### Lección 6. Backlog e implementación (generación de código)
 ```
@@ -107,7 +112,7 @@ Revisa los comentarios JSDoc de analyzer.js y la sección "Estructura del proyec
 ```
 
 ### Lección 12. Despliegue en GitHub Pages
-Primero, en **Settings > Pages > Source**, elige **GitHub Actions**. Luego:
+Pages ya está activado (Source: GitHub Actions) y publicado en https://cerbero506.github.io/anzuelo/. Después de integrar los PR de las lecciones 6 a 8, usa Copilot para verificar el nuevo despliegue:
 ```
 Revisa .github/workflows/pages.yml y confirma que ejecuta npm test antes de publicar y que solo publica index.html y assets. Sigue el despliegue en Actions hasta que termine con éxito y dame la URL final. Si no tienes permisos para algo, dime exactamente qué debo hacer yo.
 ```
