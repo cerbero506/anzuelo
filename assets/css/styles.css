@@ -247,15 +247,15 @@ input[type="text"]:focus-visible { outline: 3px solid var(--accent); outline-off
 .result__title { font-size: 1rem; color: var(--muted); }
 
 .meter__track { position: relative; display: flex; gap: 3px; height: 14px; }
-.meter__seg { height: 100%; opacity: 0.28; transition: opacity 0.3s ease; }
-.meter__seg--bajo { flex: 20; background: var(--bajo); border-radius: 7px 0 0 7px; }
-.meter__seg--medio { flex: 25; background: var(--medio); }
-.meter__seg--alto { flex: 25; background: var(--alto); }
-.meter__seg--critico { flex: 30; background: var(--critico); border-radius: 0 7px 7px 0; }
+.meter__seg { height: 100%; background: var(--line); transition: background-color 0.3s ease; }
+.meter__seg--bajo { flex: 20; border-radius: 7px 0 0 7px; }
+.meter__seg--medio { flex: 25; }
+.meter__seg--alto { flex: 25; }
+.meter__seg--critico { flex: 30; border-radius: 0 7px 7px 0; }
 .result__card[data-level="bajo"] .meter__seg--bajo,
 .result__card[data-level="medio"] .meter__seg--medio,
 .result__card[data-level="alto"] .meter__seg--alto,
-.result__card[data-level="critico"] .meter__seg--critico { opacity: 1; }
+.result__card[data-level="critico"] .meter__seg--critico { background-color: var(--level); }
 .meter__needle {
   position: absolute; top: -5px; left: 0; width: 4px; height: 24px; margin-left: -2px;
   background: var(--ink); border-radius: 2px; box-shadow: 0 0 0 2px var(--surface);
@@ -268,10 +268,17 @@ input[type="text"]:focus-visible { outline: 3px solid var(--accent); outline-off
 .meter__labels span:nth-child(3) { flex: 25; }
 .meter__labels span:nth-child(4) { flex: 30; }
 
-.verdict { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.verdict__level { font-size: 2.6rem; font-weight: 700; line-height: 1; letter-spacing: -0.02em; color: var(--level); }
-.result__card[data-level="none"] .verdict__level { font-size: 1.6rem; color: var(--muted); }
-.verdict__score { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--muted); }
+.verdict {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 14px 16px; border-left: 6px solid var(--level); border-radius: var(--r-m); background: var(--level-tint);
+}
+.verdict__level {
+  font-size: clamp(1.8rem, 7vw, 2.6rem); font-weight: 700; line-height: 1; letter-spacing: -0.02em;
+  color: var(--level); text-transform: uppercase;
+}
+.result__card[data-level="none"] .verdict { border-left-color: var(--line); }
+.result__card[data-level="none"] .verdict__level { font-size: 1.6rem; color: var(--muted); text-transform: none; }
+.verdict__score { font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
 .summary { font-weight: 700; }
 .floor { font-size: 0.9rem; padding: 10px 12px; border-radius: var(--r-m); background: var(--level-tint); }
 

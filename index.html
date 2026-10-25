@@ -102,6 +102,11 @@
         <div class="result__card" id="resultCard" data-level="none">
           <h2 id="result-title" class="result__title">Resultado</h2>
 
+          <p class="verdict">
+            <span class="verdict__level" id="levelLabel">Sin evaluar</span>
+            <span class="verdict__score" id="scoreLabel"></span>
+          </p>
+
           <div class="meter" aria-hidden="true">
             <div class="meter__track">
               <span class="meter__seg meter__seg--bajo"></span>
@@ -115,10 +120,6 @@
             </div>
           </div>
 
-          <p class="verdict">
-            <span class="verdict__level" id="levelLabel">Sin evaluar</span>
-            <span class="verdict__score" id="scoreLabel"></span>
-          </p>
           <p class="summary" id="summary">Completa al menos un dato o marca una señal para ver el resultado.</p>
           <p class="floor" id="floorNote" hidden></p>
           <p class="visually-hidden" id="srStatus" aria-live="polite"></p>

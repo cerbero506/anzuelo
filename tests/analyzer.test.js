@@ -17,6 +17,26 @@ test('reconoce dominios oficiales y no los marca como imitación', () => {
   assert.ok(ids(A.analyzeSender('Interbank <avisos@interbank.pe>')).includes('s_oficial'));
 });
 
+test('analiza enlaces en mayúsculas, con punto final y espacios iniciales', () => {
+  for (const url of [
+    'HTTPS://WWW.VIABCP.COM/',
+    'https://www.viabcp.com./',
+    '   https://www.viabcp.com/'
+  ]) {
+    const result = A.analyzeUrl(url);
+    assert.equal(result.valid, true, url);
+    assert.ok(ids(result).includes('u_oficial'), url);
+    assert.ok(!ids(result).includes('u_imita'), url);
+  }
+});
+
+test('detecta direcciones IPv6 en enlaces', () => {
+  const result = A.analyzeUrl('https://[2001:db8::1]/login');
+  assert.equal(result.valid, true);
+  assert.equal(result.host, '[2001:db8::1]');
+  assert.ok(ids(result).includes('u_ip'));
+});
+
 test('detecta dominios que imitan marcas', () => {
   assert.ok(ids(A.analyzeUrl('http://viabcp-alertas.com/login')).includes('u_imita'));
   assert.ok(ids(A.analyzeUrl('https://v1abcp.com')).includes('u_imita'), 'homoglifo 1 por i');
