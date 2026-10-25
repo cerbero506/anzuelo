@@ -125,16 +125,17 @@ npm test
 
 ## 7. Uso de GitHub Copilot
 
-El detalle de cada interacción, las sugerencias aceptadas, modificadas o rechazadas y las capturas están en **[COPILOT.md](COPILOT.md)**. Resumen:
+El detalle de las interacciones y las sugerencias aceptadas, modificadas o rechazadas está en **[COPILOT.md](COPILOT.md)**. Resumen:
 
 | Tipo de apoyo | Tarea en este proyecto | Decisión tomada |
 |---|---|---|
-| Explicación | ← completar | ← completar |
-| Implementación | ← completar (issue #1) | ← completar |
-| Planificación (Plan mode) | ← completar (issue #2) | ← completar |
-| Corrección de errores | ← completar | ← completar |
-| Refactorización | ← completar | ← completar |
-| Documentación | ← completar | ← completar |
+| Explicación | Chat sobre typosquatting, punycode y `@`; explicación del cálculo del puntaje en `analyzer.js`. | Aceptada como referencia. |
+| Diseño y pruebas | Mejora visual de la tarjeta de resultado y pruebas de casos borde (commit indicado: `5d2d2f9`; no se pudo verificar el enlace). | — |
+| Instrucciones | `/init` generó [seis reglas verificables](.github/copilot-instructions.md). | Modificadas; se rechazó configurar Playwright MCP porque basta el navegador integrado y no se agregan herramientas externas. |
+| Implementación | Exportación CSV con BOM UTF-8 para [issue #1](https://github.com/cerbero506/anzuelo/issues/1), [PR #4](https://github.com/cerbero506/anzuelo/pull/4). | Modificada durante la revisión para proteger contra inyección de fórmulas (`=`, `+`, `-`, `@`) y agregar pruebas. |
+| Planificación (Plan mode) | [Issue #2](https://github.com/cerbero506/anzuelo/issues/2), [PR #5](https://github.com/cerbero506/anzuelo/pull/5). | Plan modificado con cinco ajustes antes de aprobarlo. |
+| Refactorización y documentación | [PR #6](https://github.com/cerbero506/anzuelo/pull/6): `renderResult` dividido en siete funciones y JSDoc de typosquatting corregido. | Aceptada con observación sobre el JSDoc extenso de `evaluate`. |
+| Revisión | Comentario de revisión manual en cada PR: [#4](https://github.com/cerbero506/anzuelo/pull/4), [#5](https://github.com/cerbero506/anzuelo/pull/5) y [#6](https://github.com/cerbero506/anzuelo/pull/6). | Revisión manual; Copilot Free no incluye code review. |
 
 Se usó **GitHub Copilot Free**; se omitió la revisión automática de pull requests de Copilot (no incluida en Free) y se reemplazó por revisión manual, como indica el workshop.
 

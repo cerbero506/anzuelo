@@ -2,38 +2,29 @@
 
 Este documento cumple dos funciones:
 
-1. **Guía:** cómo se siguió el workshop [GitHub Copilot app tour](https://github-samples.github.io/copilot-workshops/first-steps/copilot-app/) adaptado a Anzuelo, con los prompts usados.
-2. **Evidencia:** bitácora de cada interacción con Copilot, qué propuso y qué se decidió.
+1. **Guía:** referencia para adaptar el workshop [GitHub Copilot app tour](https://github-samples.github.io/copilot-workshops/first-steps/copilot-app/) a Anzuelo.
+2. **Evidencia:** bitácora de interacciones reales con Copilot, qué propuso y qué se decidió.
 
 Plan utilizado: **GitHub Copilot Free**.
 
-> Regla de esta bitácora: solo se registran interacciones que realmente ocurrieron, con su captura, commit, issue o PR como respaldo. Las filas sin evidencia se eliminan antes de entregar.
+> Regla de esta bitácora: solo se registran interacciones reales. Cuando existe un artefacto versionado, se enlaza el commit, issue o PR; no se usan capturas como evidencia.
 
 ---
 
 ## 1. Ajustes por usar Copilot Free
 
-| Lección del workshop | Estado | Motivo |
-|---|---|---|
-| 0 a 4, 6 y 7 | Realizadas, adaptadas a Anzuelo | Disponibles en Free |
-| 5. Publicar el repositorio | **Sin Copilot** | El repositorio y su primer commit se crearon fuera de Copilot, con otro asistente de IA. En esta lección solo se clona y se vincula en la app de Copilot. |
-| 8. Revisión de PR | **Parcial** | Copilot Free no incluye Copilot code review en pull requests. Se hicieron los pasos 1-4 (crear el PR) y la revisión del diff fue manual, como indica el propio workshop. |
-| 9. Automatizaciones | Omitida si no está disponible | No es necesaria para la solución |
-| 10. Sesión remota | Omitida | Opcional en el workshop |
-| 11. Canvas | Omitida si no está disponible | No es necesaria para la solución |
-| 12. GitHub Pages | Realizada | Workflow `pages.yml` revisado y verificado |
-| 13. Cierre | Realizada | Resumen en esta bitácora |
+Copilot Free no incluye code review automático. Por eso, los PR [#4](https://github.com/cerbero506/anzuelo/pull/4), [#5](https://github.com/cerbero506/anzuelo/pull/5) y [#6](https://github.com/cerbero506/anzuelo/pull/6) recibieron un comentario de revisión manual antes del merge.
 
 ## 2. Paso a paso adaptado
 
-El workshop parte de una carpeta vacía y construye un quiz. En Anzuelo se partió del código base de este repositorio y Copilot se usó para explicar, extender, corregir, refactorizar, documentar y desplegar.
+Los prompts de esta sección son ejemplos para adaptar el workshop, no evidencia de interacciones adicionales. La bitácora de hechos registrados está en la sección 3.
 
 ### Lección 0. Chat rápido (explicación)
-En **New > Chat**:
+Ejemplo para **New > Chat**:
 ```
 Explica con ejemplos qué es el typosquatting, el uso de punycode y el truco de la "@" en una URL para ocultar el destino real en correos de phishing.
 ```
-Evidencia: captura de la respuesta. Úsala para validar que las reglas de `analyzer.js` cubren esos casos.
+El tema de la explicación fue typosquatting, punycode y el uso de `@`; se aceptó como referencia.
 
 ### Lección 1. Crear la sesión
 Clona el repositorio y ábrelo en una sesión **Interactive**:
@@ -65,12 +56,13 @@ Agrega pruebas en tests/analyzer.test.js para enlaces en mayúsculas, con punto 
 ```
 /init create simple rules for the project
 ```
-Revisa el archivo generado y deja solo reglas reales de este proyecto, por ejemplo:
-- Sitio estático: HTML, CSS y JS sin dependencias ni CDN.
+`/init` generó `.github/copilot-instructions.md`; sus reglas se redujeron a seis criterios verificables y se modificaron:
+- Sitio estático en HTML, CSS y JavaScript, sin dependencias, CDN ni peticiones de red; se respeta `connect-src 'none'`.
 - Insertar texto del usuario solo con `textContent`, nunca `innerHTML`.
-- Interfaz en español, en tono claro para personas no técnicas.
-- Pesos y listas en `criteria.js`; lógica pura en `analyzer.js`; DOM solo en `app.js`.
-- Todo cambio en `analyzer.js` lleva pruebas y `npm test` en verde.
+- Mantener la interfaz y los mensajes en español, con un tono claro para personas no técnicas.
+- Separar pesos y listas en `criteria.js`, lógica pura en `analyzer.js`, historial en `storage.js` y DOM en `app.js`.
+- Todo cambio en `analyzer.js` lleva pruebas y debe dejar `npm test` en verde.
+- Las pruebas en navegador se hacen con el navegador integrado; no se configuran Playwright ni otras herramientas externas.
 
 ### Lección 5. Publicar el repositorio
 El repositorio público ya existe (https://github.com/cerbero506/anzuelo), así que no se usa el prompt de publicación del workshop. Haz commit y push de los cambios de las lecciones 2 a 4 desde la sesión:
@@ -122,31 +114,20 @@ Abre la URL en una ventana privada y verifica que la app carga.
 
 ## 3. Bitácora de evidencia
 
-Completa una fila por interacción real. **Decisión** debe decir si aceptaste, modificaste o rechazaste la sugerencia y por qué.
-
-| # | Lección | Tipo de apoyo | Prompt (resumen) | Qué propuso Copilot | Decisión y motivo | Evidencia |
-|---|---|---|---|---|---|---|
-| 1 | 0 | Explicación | Typosquatting, punycode, "@" | | | `docs/capturas/01-chat.png` |
-| 2 | 2 | Explicación | Cómo se calcula el puntaje | | | |
-| 3 | 2 | Diseño | Pulir tarjeta de resultado | | | |
-| 4 | 3 | Corrección de errores | Prueba de humo + casos borde | | | commit |
-| 5 | 4 | Instrucciones | `/init` | | | archivo de instrucciones |
-| 6 | 6 | Implementación | Issue exportar CSV | | | issue #, PR # |
-| 7 | 7 | Planificación | Issue texto pegado | | | captura del plan |
-| 8 | 8 | Revisión | Revisión del diff | | | comentario en PR |
-| 9 | - | Refactorización | `renderResult` | | | commit |
-| 10 | - | Documentación | JSDoc + README | | | commit |
-| 11 | 12 | Despliegue | Revisión de workflow y Pages | | | ejecución en Actions |
+| # | Tipo de apoyo | Interacción y resultado | Decisión | Evidencia |
+|---|---|---|---|---|
+| 1 | Explicación | Chat sobre typosquatting, punycode y `@`; explicación de cómo `analyzer.js` calcula el puntaje. | Aceptada como referencia. | — |
+| 2 | Diseño y pruebas | Mejora visual de la tarjeta de resultado y nuevas pruebas de casos borde (commit indicado: `5d2d2f9`). | — | No se pudo verificar el hash en el historial local ni en GitHub. |
+| 3 | Instrucciones | `/init` generó las instrucciones del repositorio, reducidas a seis reglas verificables. | Modificada. | [`.github/copilot-instructions.md`](.github/copilot-instructions.md) |
+| 4 | Implementación | Issue [#1](https://github.com/cerbero506/anzuelo/issues/1), PR [#4](https://github.com/cerbero506/anzuelo/pull/4): exportación CSV con BOM UTF-8. | Modificada durante la revisión: se agregó protección contra inyección de fórmulas (`=`, `+`, `-`, `@`) y pruebas. | [PR #4](https://github.com/cerbero506/anzuelo/pull/4) |
+| 5 | Planificación | Issue [#2](https://github.com/cerbero506/anzuelo/issues/2), PR [#5](https://github.com/cerbero506/anzuelo/pull/5), en Plan mode. | Plan modificado con cinco ajustes antes de aprobarlo: límite de 20 000 caracteres para evitar ReDoS, normalización de tildes, pruebas negativas, `aria-live` y `textContent`, y limpieza y ejemplo. | [PR #5](https://github.com/cerbero506/anzuelo/pull/5) |
+| 6 | Refactorización y documentación | PR [#6](https://github.com/cerbero506/anzuelo/pull/6): `renderResult` se dividió en siete funciones y se corrigió el JSDoc de la tolerancia de typosquatting. | Aceptada con observación: el JSDoc de `evaluate` quedó en una línea extensa. | [PR #6](https://github.com/cerbero506/anzuelo/pull/6) |
+| 7 | Revisión | Revisión manual de cada PR antes del merge. | Revisión manual; Copilot Free no incluye code review. | [PR #4](https://github.com/cerbero506/anzuelo/pull/4), [#5](https://github.com/cerbero506/anzuelo/pull/5) y [#6](https://github.com/cerbero506/anzuelo/pull/6) |
 
 ### Sugerencias rechazadas o modificadas
-Registra aquí al menos dos casos concretos. Criterios usados para decidir:
-
-- ¿Agrega dependencias, CDN o peticiones de red? Se rechaza: rompe la privacidad y el requisito de sitio estático.
-- ¿Usa `innerHTML` con datos del usuario? Se modifica a `textContent`.
-- ¿Cambia pesos o umbrales sin justificación? Se rechaza o se documenta el motivo.
-- ¿Rompe `npm test` o la navegación por teclado? Se corrige antes de integrar.
 
 | Sugerencia de Copilot | Qué se hizo | Por qué |
 |---|---|---|
-| | | |
-| | | |
+| Configurar Playwright MCP. | Rechazada. | El navegador integrado basta y no se agregan herramientas externas. |
+| Exportar CSV sin protección contra fórmulas. | Modificada: se protegieron los prefijos `=`, `+`, `-` y `@` y se agregaron pruebas. | Evitar inyección de fórmulas en los datos exportados. |
+| Plan del issue #2. | Modificado con cinco ajustes antes de aprobar: límite de 20 000 caracteres para evitar ReDoS, normalización de tildes, pruebas negativas, `aria-live` y `textContent`, y limpieza y ejemplo. | Incorporar los requisitos de seguridad, accesibilidad, pruebas y claridad del plan. |
