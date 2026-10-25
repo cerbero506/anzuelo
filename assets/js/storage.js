@@ -31,7 +31,7 @@
   }
 
   const Store = {
-    /** @returns {Array<{id: string, date: string, subject: string, sender: string, score: number, levelKey: string, levelLabel: string, exposed: boolean, report: string}>} */
+    /** @returns {Array<{id: string, date: string, subject: string, sender: string, url?: string, score: number, levelKey: string, levelLabel: string, exposed: boolean, report: string}>} */
     list() {
       const items = read(KEY_HISTORY, []);
       return Array.isArray(items) ? items : [];

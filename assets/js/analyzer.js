@@ -383,12 +383,12 @@
     if (!text) return '';
     return text
       .replace(/^http/i, 'hxxp')
-      .replace(/^([a-z]+:\/\/)?([^/?#]*)/i, (m, scheme, authority) => (scheme || '') + authority.replace(/\./g, '[.]').replace(/@/g, '[@]'));
+      .replace(/^([a-z]+:\/\/)?([^/?#]*)/i, (m, scheme, authority) => (scheme || '') + authority.replace(/\.(?!\])/g, '[.]').replace(/@(?!\])/g, '[@]'));
   }
 
   /** Desactiva un correo: ana@dominio.com → ana[@]dominio[.]com */
   function defangEmail(raw) {
-    return String(raw || '').trim().replace(/@([^\s>]+)/g, (m, d) => '[@]' + d.replace(/\./g, '[.]'));
+    return String(raw || '').trim().replace(/(^|[^[])@([^\s>]+)/g, (m, before, domain) => before + '[@]' + domain.replace(/\.(?!\])/g, '[.]'));
   }
 
   function pad(n) { return String(n).padStart(2, '0'); }
@@ -396,6 +396,29 @@
   function formatDate(date) {
     const d = date instanceof Date ? date : new Date(date);
     return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function csvCell(value) {
+    const text = String(value == null ? '' : value);
+    const safe = /^[=+\-@\t\r]/.test(text) ? "'" + text : text;
+    return `"${safe.replace(/"/g, '""')}"`;
+  }
+
+  /** Construye un CSV del historial con correos y enlaces desactivados. */
+  function buildHistoryCsv(items) {
+    const rows = [
+      ['Fecha', 'Asunto', 'Remitente', 'Enlace', 'Puntaje (sobre 100)', 'Nivel de riesgo', 'Hubo interacción'],
+      ...items.map((item) => [
+        formatDate(item.date),
+        item.subject || '(sin asunto)',
+        defangEmail(item.sender),
+        item.url ? defangUrl(item.url) : '',
+        item.score,
+        item.levelLabel,
+        item.exposed ? 'Sí' : 'No'
+      ])
+    ];
+    return '\uFEFF' + rows.map((row) => row.map(csvCell).join(',')).join('\r\n');
   }
 
   /**
@@ -443,6 +466,6 @@
   return {
     normalizeDomain, isIp, registrableDomain, mainLabel, matchesDomain, levenshtein, deglyph,
     detectLookalike, brandList, parseSender, analyzeUrl, analyzeSender, levelFor, evaluate,
-    defangUrl, defangEmail, formatDate, buildReport
+    defangUrl, defangEmail, formatDate, buildHistoryCsv, buildReport
   };
 });

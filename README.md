@@ -41,7 +41,7 @@ Anzuelo guía a la persona en tres pasos: copiar los datos del correo (sin abrir
 5. **Puntaje y nivel de riesgo explicables:** medidor visual, principales motivos y regla de señal crítica.
 6. **Acciones según el nivel y según la interacción:** si la persona ya hizo clic, ingresó credenciales o abrió un adjunto, aparecen primero las acciones urgentes.
 7. **Reporte para TI:** se copia o descarga como `.txt`, con enlaces y correos desactivados (`hxxp`, `[.]`, `[@]`) para evitar clics accidentales.
-8. **Historial local:** guarda hasta 50 evaluaciones en el navegador para volver a copiar un reporte.
+8. **Historial local:** guarda hasta 50 evaluaciones en el navegador para volver a copiar un reporte o descargarlas como CSV UTF-8.
 9. **Accesible y adaptable:** navegación por teclado, lectores de pantalla, modo oscuro automático, diseño móvil con barra de resultado fija y tipografía de alta legibilidad.
 
 ## 3. Cómo se evalúa
@@ -73,10 +73,10 @@ anzuelo/
 │   ├── fonts/                  Atkinson Hyperlegible Next (auto-alojada, OFL)
 │   └── js/
 │       ├── criteria.js         Datos: señales, pesos, marcas, listas, recomendaciones
-│       ├── analyzer.js         Motor: análisis de enlace y remitente, puntaje, reporte (funciones puras)
+│       ├── analyzer.js         Motor: análisis, puntaje, reportes y formato CSV (funciones puras)
 │       ├── storage.js          Historial en localStorage con respaldo en memoria
 │       └── app.js              Interfaz: eventos y renderizado
-├── tests/analyzer.test.js      13 pruebas del motor (node:test, sin dependencias)
+├── tests/analyzer.test.js      Pruebas del motor y del CSV (node:test, sin dependencias)
 ├── .github/workflows/pages.yml Pruebas + despliegue en GitHub Pages
 ├── COPILOT.md                  Uso de GitHub Copilot: pasos del workshop y bitácora de evidencia
 └── docs/                       Guion del video y capturas de evidencia
@@ -128,7 +128,7 @@ Se usó **GitHub Copilot Free**; se omitió la revisión automática de pull req
 
 - **Sin conexión a servidores:** la política de seguridad de contenido (`connect-src 'none'`) impide cualquier petición de red desde la página. No hay analítica, CDN ni fuentes externas.
 - **Sin inyección de HTML:** todo el texto del usuario se inserta con `textContent`.
-- **Enlaces desactivados** en reportes e historial.
+- **Enlaces desactivados** en reportes, historial y exportaciones CSV.
 - **Datos locales:** el historial y el dominio de la organización se guardan solo en `localStorage` del navegador.
 
 ## 9. Limitaciones
@@ -139,7 +139,6 @@ Se usó **GitHub Copilot Free**; se omitió la revisión automática de pull req
 
 ## 10. Trabajo futuro
 
-- Exportar el historial a CSV.
 - Detectar señales en el texto pegado del correo.
 - Modo de práctica con correos de entrenamiento.
 
