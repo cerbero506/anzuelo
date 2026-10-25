@@ -1,0 +1,14 @@
+{
+  "name": "anzuelo",
+  "version": "1.0.0",
+  "description": "Triaje de correos sospechosos de phishing para colaboradores no técnicos. Sitio estático, sin dependencias.",
+  "private": true,
+  "scripts": {
+    "test": "node --test",
+    "start": "python3 -m http.server 8080"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Política de seguridad: la página no puede conectarse a ningún servidor (connect-src 'none'). -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>Anzuelo | Revisa correos sospechosos</title>
+  <meta name="description" content="Herramienta para que cualquier colaborador evalúe un correo sospechoso de phishing, conozca su nivel de riesgo y genere un reporte para TI. Funciona sin conexión a servidores.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230D6B66'/%3E%3Cpath d='M19 6v12a6 6 0 0 1-12 0v-2l-2 3' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='19' cy='6' r='2' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <a class="skip" href="#evaluacion">Saltar al formulario</a>
+
+  <header class="top">
+    <div class="wrap top__inner">
+      <a class="brand" href="#main" aria-label="Anzuelo, inicio">
+        <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="8"/>
+          <path d="M19 6v12a6 6 0 0 1-12 0v-2l-2 3"/>
+          <circle cx="19" cy="6" r="2"/>
+        </svg>
+        <span class="brand__name">Anzuelo</span>
+      </a>
+      <a class="top__link" href="#historial">Historial <span id="historyCount" class="count">0</span></a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="intro wrap">
+      <h1>¿Este correo es phishing?</h1>
+      <p class="lede">Revísalo aquí antes de hacer clic. En dos minutos sabrás qué tan riesgoso es y qué hacer.</p>
+      <p class="privacy">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+        Todo se evalúa en tu navegador. No se envía ningún dato.
+      </p>
+    </section>
+
+    <div class="wrap layout">
+      <form id="evaluacion" class="form" novalidate>
+        <section class="step" aria-labelledby="s1-title">
+          <div class="step__head">
+            <span class="step__num" aria-hidden="true">1</span>
+            <h2 id="s1-title">Datos del correo</h2>
+          </div>
+          <p class="step__help">Copia los datos sin abrir el enlace: clic derecho sobre él y “Copiar dirección del enlace”. En el celular, mantenlo presionado.</p>
+
+          <div class="field">
+            <label for="subject">Asunto <span class="optional">opcional</span></label>
+            <input id="subject" name="subject" type="text" autocomplete="off" spellcheck="false" placeholder="Su cuenta será bloqueada hoy">
+          </div>
+          <div class="field">
+            <label for="sender">Remitente</label>
+            <input id="sender" name="sender" type="text" autocomplete="off" spellcheck="false" placeholder="Banco Seguro &lt;avisos@banco-seguro-alertas.com&gt;" aria-describedby="sender-help">
+            <p id="sender-help" class="field__help">Pega el nombre y la dirección tal como aparecen en el correo.</p>
+          </div>
+          <div class="field">
+            <label for="url">Enlace del correo <span class="optional">opcional</span></label>
+            <input id="url" name="url" type="text" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://ejemplo.com/verificar-cuenta">
+          </div>
+          <details class="field field--org" id="orgDetails">
+            <summary>Dominio de tu organización <span class="optional">opcional</span></summary>
+            <label for="orgDomain" class="visually-hidden">Dominio de tu organización</label>
+            <input id="orgDomain" name="orgDomain" type="text" autocomplete="off" spellcheck="false" placeholder="miempresa.com.pe" aria-describedby="org-help">
+            <p id="org-help" class="field__help">Detecta dominios que imitan al de tu empresa, típicos del fraude al proveedor o “fraude del CEO”. Se recuerda en este navegador.</p>
+          </details>
+
+          <button type="button" id="loadExample" class="btn btn--quiet">Cargar un ejemplo</button>
+
+          <div class="auto">
+            <h3>Revisión automática</h3>
+            <ul id="autoFindings" class="findings"></ul>
+            <p id="autoEmpty" class="empty">Escribe el remitente o el enlace y aquí verás lo que se detecta.</p>
+          </div>
+        </section>
+
+        <section class="step" aria-labelledby="s2-title">
+          <div class="step__head">
+            <span class="step__num" aria-hidden="true">2</span>
+            <h2 id="s2-title">Señales que observas</h2>
+          </div>
+          <p class="step__help">Marca solo lo que veas en el correo. El número indica cuánto suma al puntaje.</p>
+          <div id="indicatorGroups"></div>
+        </section>
+
+        <section class="step" aria-labelledby="s3-title">
+          <div class="step__head">
+            <span class="step__num" aria-hidden="true">3</span>
+            <h2 id="s3-title">¿Ya interactuaste con el correo?</h2>
+          </div>
+          <p class="step__help">Responde con sinceridad: no cambia el puntaje, cambia lo que debes hacer primero.</p>
+          <fieldset class="checklist" id="exposureList">
+            <legend class="visually-hidden">Interacciones con el correo</legend>
+          </fieldset>
+        </section>
+      </form>
+
+      <aside class="result" aria-labelledby="result-title">
+        <div class="result__card" id="resultCard" data-level="none">
+          <h2 id="result-title" class="result__title">Resultado</h2>
+
+          <div class="meter" aria-hidden="true">
+            <div class="meter__track">
+              <span class="meter__seg meter__seg--bajo"></span>
+              <span class="meter__seg meter__seg--medio"></span>
+              <span class="meter__seg meter__seg--alto"></span>
+              <span class="meter__seg meter__seg--critico"></span>
+              <span class="meter__needle" id="needle"></span>
+            </div>
+            <div class="meter__labels">
+              <span>Bajo</span><span>Medio</span><span>Alto</span><span>Crítico</span>
+            </div>
+          </div>
+
+          <p class="verdict">
+            <span class="verdict__level" id="levelLabel">Sin evaluar</span>
+            <span class="verdict__score" id="scoreLabel"></span>
+          </p>
+          <p class="summary" id="summary">Completa al menos un dato o marca una señal para ver el resultado.</p>
+          <p class="floor" id="floorNote" hidden></p>
+          <p class="visually-hidden" id="srStatus" aria-live="polite"></p>
+
+          <div class="urgent" id="exposureBlock" hidden>
+            <h3>Ya interactuaste: haz esto primero</h3>
+            <ul id="exposureActions"></ul>
+          </div>
+
+          <div class="block" id="reasonsBlock" hidden>
+            <h3>Principales motivos</h3>
+            <ul class="reasons" id="reasons"></ul>
+          </div>
+
+          <div class="block" id="stepsBlock" hidden>
+            <h3>Qué hacer ahora</h3>
+            <ol class="steps" id="steps"></ol>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="btn btn--primary" id="copyReport" disabled>Copiar reporte</button>
+            <button type="button" class="btn" id="downloadReport" disabled>Descargar reporte</button>
+            <button type="button" class="btn" id="saveEval" disabled>Guardar en el historial</button>
+            <button type="button" class="btn btn--quiet" id="resetForm">Nueva evaluación</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <section id="historial" class="wrap history" aria-labelledby="history-title">
+      <div class="history__head">
+        <div>
+          <h2 id="history-title">Historial</h2>
+          <p class="history__note">Se guarda solo en este navegador. Los remitentes aparecen desactivados para evitar clics.</p>
+        </div>
+        <button type="button" class="btn btn--quiet" id="clearHistory" hidden>Borrar historial</button>
+      </div>
+      <ul class="history__list" id="historyList"></ul>
+      <p class="empty" id="historyEmpty">Aún no guardaste evaluaciones. Usa “Guardar en el historial” para llevar un registro de lo que reportaste.</p>
+    </section>
+  </main>
+
+  <div class="mobilebar" id="mobileBar" hidden>
+    <span class="mobilebar__text" id="mobileText"></span>
+    <a class="btn btn--primary" href="#result-title">Ver resultado</a>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <footer class="foot">
+    <div class="wrap">
+      <p>Anzuelo es una herramienta de apoyo basada en reglas. No reemplaza al área de TI ni al equipo de seguridad: ante la duda, repórtalo.</p>
+      <p>Criterios basados en las guías de
+        <a href="https://www.incibe.es/empresas/blog/busca-otro-al-enganar-yo-no-voy-picar" rel="noopener noreferrer" target="_blank">INCIBE</a> y
+        <a href="https://www.cisa.gov/secure-our-world/recognize-and-report-phishing" rel="noopener noreferrer" target="_blank">CISA</a>.
+        <span id="repoNote" hidden>Código abierto en <a id="repoLink" href="#" rel="noopener noreferrer" target="_blank">GitHub</a>.</span></p>
+    </div>
+  </footer>
+
+  <script src="assets/js/criteria.js"></script>
+  <script src="assets/js/analyzer.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
