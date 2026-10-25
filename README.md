@@ -42,8 +42,9 @@ Anzuelo guía a la persona: copiar los datos del correo (sin abrir el enlace), r
 6. **Puntaje y nivel de riesgo explicables:** medidor visual, principales motivos y regla de señal crítica.
 7. **Acciones según el nivel y según la interacción:** si la persona ya hizo clic, ingresó credenciales o abrió un adjunto, aparecen primero las acciones urgentes.
 8. **Reporte para TI:** se copia o descarga como `.txt`, con enlaces y correos desactivados (`hxxp`, `[.]`, `[@]`) para evitar clics accidentales.
-9. **Historial local:** guarda hasta 50 evaluaciones en el navegador para volver a copiar un reporte o descargarlas como CSV UTF-8.
-10. **Accesible y adaptable:** navegación por teclado, lectores de pantalla, modo oscuro automático, diseño móvil con barra de resultado fija y tipografía de alta legibilidad.
+9. **Historial local:** guarda hasta 50 evaluaciones en el navegador para volver a copiar un reporte.
+10. **Exportación del historial a CSV UTF-8:** permite descargar las evaluaciones guardadas.
+11. **Accesible y adaptable:** navegación por teclado, lectores de pantalla, modo oscuro automático, diseño móvil con barra de resultado fija y tipografía de alta legibilidad.
 
 ## 3. Cómo se evalúa
 
@@ -155,6 +156,7 @@ Se usó **GitHub Copilot Free**; se omitió la revisión automática de pull req
 ## 10. Trabajo futuro
 
 - Modo de práctica con correos de entrenamiento.
+- [Filtrar el historial por nivel de riesgo (#3)](https://github.com/cerbero506/anzuelo/issues/3).
 
 ## 11. Declaración de uso de IA
 
