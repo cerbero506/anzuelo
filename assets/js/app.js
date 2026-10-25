@@ -29,10 +29,13 @@
     subject: $('subject'),
     sender: $('sender'),
     url: $('url'),
+    messageBody: $('messageBody'),
     orgDomain: $('orgDomain'),
     orgDetails: $('orgDetails'),
     autoFindings: $('autoFindings'),
     autoEmpty: $('autoEmpty'),
+    messageStatus: $('messageStatus'),
+    messageFindings: $('messageFindings'),
     card: $('resultCard'),
     needle: $('needle'),
     levelLabel: $('levelLabel'),
@@ -64,6 +67,7 @@
   let resultVisible = true;
   let srTimer = null;
   let toastTimer = null;
+  let messageTimer = null;
 
   /* ---------- Construcción del formulario ---------- */
 
@@ -123,6 +127,16 @@
   function update() {
     current = A.evaluate(readInput());
     renderAuto(current);
+    clearTimeout(messageTimer);
+    if (document.activeElement === ui.messageBody) {
+      messageTimer = setTimeout(() => {
+        messageTimer = null;
+        renderMessageReview(A.analyzeMessage(ui.messageBody.value));
+      }, 350);
+    } else {
+      messageTimer = null;
+      renderMessageReview(A.analyzeMessage(ui.messageBody.value));
+    }
     renderResult(current);
     renderMobileBar();
   }
@@ -149,6 +163,32 @@
       count++;
     }
     ui.autoEmpty.hidden = count > 0;
+  }
+
+  function renderMessageReview(review) {
+    ui.messageFindings.replaceChildren();
+    if (!ui.messageBody.value.length) {
+      ui.messageStatus.textContent = '';
+      return;
+    }
+
+    const count = review.findings.length;
+    const parts = count
+      ? [`Se ${count === 1 ? 'detectó' : 'detectaron'} ${count} ${count === 1 ? 'indicio orientativo' : 'indicios orientativos'}.`]
+      : ['No se encontraron frases de las señales revisadas. Esto no confirma que el correo sea seguro.'];
+    if (review.truncated) parts.push('Solo se revisaron los primeros 20 000 caracteres.');
+    ui.messageStatus.textContent = parts.join(' ');
+
+    for (const finding of review.findings) {
+      const li = el('li', { class: 'text-finding' });
+      li.append(
+        el('span', { class: 'text-finding__title' }, finding.label),
+        el('span', { class: 'text-finding__excerpt' }, `“${finding.excerpt}”`),
+        el('span', null, finding.explanation),
+        el('span', { class: 'text-finding__indicator' }, ` Señal relacionada: ${finding.indicatorLabel}. Confírmala manualmente en el checklist si corresponde.`)
+      );
+      ui.messageFindings.append(li);
+    }
   }
 
   /* ---------- Render: resultado ---------- */
@@ -293,6 +333,7 @@
     ui.subject.value = 'Alerta: su acceso a Banca por Internet será suspendido';
     ui.sender.value = 'BCP Seguridad <alertas@viabcp-verificacion.com>';
     ui.url.value = 'http://viabcp-verificacion.com/banca/validar?cliente=48213';
+    ui.messageBody.value = 'Su cuenta será suspendida hoy. Para evitarlo, ingrese su contraseña y el código de verificación en el enlace. Abra el archivo adjunto para completar la revisión.';
     for (const id of ['r_inesperado', 'c_urgencia', 'c_credenciales', 'e_login']) {
       const box = $(`ind-${id}`);
       if (box) box.checked = true;

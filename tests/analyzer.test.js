@@ -113,6 +113,57 @@ test('sin datos no hay evaluación', () => {
   assert.equal(A.evaluate({}).hasData, false);
 });
 
+test('detecta señales explícitas en español, normalizando mayúsculas y tildes', () => {
+  const review = A.analyzeMessage('ATENCIÓN: ingrese su CONTRASEÑA. La cuenta será suspendida en las próximas 24 horas.');
+  const urgency = review.findings.find((finding) => finding.indicatorId === 'c_urgencia');
+  const credentials = review.findings.find((finding) => finding.indicatorId === 'c_credenciales');
+
+  assert.equal(review.truncated, false);
+  assert.ok(urgency);
+  assert.ok(credentials);
+  assert.match(credentials.excerpt, /CONTRASEÑA/);
+  assert.match(urgency.excerpt, /suspendida en las próximas 24 horas/i);
+  assert.ok(A.analyzeMessage('Ingrese su contrasena.').findings.some((finding) => finding.indicatorId === 'c_credenciales'));
+});
+
+test('detecta frases explícitas en inglés y solicitudes de adjunto o macros', () => {
+  const review = A.analyzeMessage('URGENT ACTION REQUIRED: Please enter your password. Open the attachment and enable macros.');
+  const indicatorIds = review.findings.map((finding) => finding.indicatorId);
+
+  assert.ok(indicatorIds.includes('c_urgencia'));
+  assert.ok(indicatorIds.includes('c_credenciales'));
+  assert.ok(indicatorIds.includes('a_inesperado'));
+  assert.ok(indicatorIds.includes('a_macros'));
+});
+
+test('no genera hallazgos para frases legítimas que solo mencionan los temas', () => {
+  const review = A.analyzeMessage('La contraseña protege tu cuenta. El pago fue recibido. El archivo adjunto contiene la factura. El asunto es urgente.');
+  assert.deepEqual(review.findings, []);
+});
+
+test('limita la revisión del texto a 20 000 caracteres', () => {
+  const inRange = A.analyzeMessage(`${'x'.repeat(19970)} Ingresa tu contraseña ${'x'.repeat(20)}`);
+  const outOfRange = A.analyzeMessage(`${'x'.repeat(20000)} Ingresa tu contraseña`);
+
+  assert.equal(inRange.truncated, true);
+  assert.ok(inRange.findings.some((finding) => finding.indicatorId === 'c_credenciales'));
+  assert.ok(inRange.findings.every((finding) => finding.excerpt.length <= 122));
+  assert.equal(outOfRange.truncated, true);
+  assert.deepEqual(outOfRange.findings, []);
+});
+
+test('las sugerencias no se incorporan al puntaje sin confirmación manual', () => {
+  const review = A.analyzeMessage('Ingresa tu contraseña para continuar.');
+  const unconfirmed = A.evaluate({});
+  const confirmed = A.evaluate({ indicators: ['c_credenciales'] });
+
+  assert.ok(review.findings.some((finding) => finding.indicatorId === 'c_credenciales'));
+  assert.equal(unconfirmed.hasData, false);
+  assert.equal(unconfirmed.score, 0);
+  assert.equal(confirmed.score, 30);
+  assert.equal(confirmed.level.key, 'alto');
+});
+
 test('el reporte desactiva enlaces y correos', () => {
   assert.equal(A.defangUrl('https://viabcp-alertas.com/login'), 'hxxps://viabcp-alertas[.]com/login');
   assert.equal(A.defangEmail('BCP <a@b.com.pe>'), 'BCP <a[@]b[.]com[.]pe>');
