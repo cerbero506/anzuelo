@@ -400,7 +400,7 @@
 
   function csvCell(value) {
     const text = String(value == null ? '' : value);
-    const safe = /^[=+\-@]/.test(text) ? "'" + text : text;
+    const safe = /^[=+\-@\t\r]/.test(text) ? "'" + text : text;
     return `"${safe.replace(/"/g, '""')}"`;
   }
 

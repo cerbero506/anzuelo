@@ -166,8 +166,8 @@ test('exporta asunto y remitente ausentes de forma coherente con el historial', 
   assert.match(csv, /"\(sin asunto\)","","","0","Bajo","No"/);
 });
 
-test('neutraliza fórmulas de hoja de cálculo en celdas CSV', () => {
-  const csv = A.buildHistoryCsv(['=', '+', '-', '@'].map((prefix, index) => ({
+test('neutraliza fórmulas y caracteres de control iniciales en celdas CSV', () => {
+  const csv = A.buildHistoryCsv(['=', '+', '-', '@', '\t', '\r'].map((prefix, index) => ({
     date: new Date(2026, 9, 25, 9, 5),
     subject: `${prefix}2+2`,
     sender: '',
@@ -176,7 +176,7 @@ test('neutraliza fórmulas de hoja de cálculo en celdas CSV', () => {
     exposed: false
   })));
 
-  for (const formula of ["'=2+2", "'+2+2", "'-2+2", "'@2+2"]) {
-    assert.ok(csv.includes(`"${formula}"`), `debe proteger ${formula}`);
+  for (const unsafeValue of ["'=2+2", "'+2+2", "'-2+2", "'@2+2", "'\t2+2", "'\r2+2"]) {
+    assert.ok(csv.includes(`"${unsafeValue}"`), `debe proteger ${JSON.stringify(unsafeValue)}`);
   }
 });
