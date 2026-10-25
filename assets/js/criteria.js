@@ -60,6 +60,59 @@
       label: 'El documento pide “Habilitar edición” o “Habilitar contenido”' }
   ];
 
+  /** Frases explícitas que orientan la revisión manual del cuerpo del mensaje. */
+  const TEXT_SIGNALS = [
+    {
+      id: 'texto_urgencia',
+      indicatorId: 'c_urgencia',
+      label: 'Presión o urgencia',
+      explanation: 'Los plazos o amenazas inesperados pueden presionarte para actuar sin verificar.',
+      pattern: '\\b(accion inmediata|urgent action required|within (24|48) hours|before end of day|antes de (hoy|las? [0-9]{1,2})|en las proximas? (24|48) horas|cuenta sera (suspendida|bloqueada))\\b'
+    },
+    {
+      id: 'texto_credenciales',
+      indicatorId: 'c_credenciales',
+      label: 'Solicitud de contraseña o código',
+      explanation: 'No compartas contraseñas ni códigos de verificación por correo.',
+      pattern: '\\b(ingresa|ingrese|introduce|introduzca|confirma|confirme|actualiza|actualice|proporciona|proporcione|envia|envie|enter|provide|confirm|verify|update|share|send) (tu |su |your |el |la |the )?(contrasena|password|credenciales|credentials|codigo de verificacion|verification code|one[- ]time code)\\b'
+    },
+    {
+      id: 'texto_pago',
+      indicatorId: 'c_pago',
+      label: 'Solicitud de pago o cambio bancario',
+      explanation: 'Verifica pagos y cambios de cuenta por un canal conocido antes de actuar.',
+      pattern: '\\b(realiza|realice|haz|haga|efectua|efectue|envia|envie|transfiere|transfiera|paga|pague|make|send|wire) (el |un |una |the |a )?(pago|deposito|transferencia|transfer|payment|deposit)\\b|\\b(cambia|cambie|actualiza|actualice|change|update) (la |una |the |a )?(cuenta bancaria|datos bancarios|bank account|bank details|account number)\\b'
+    },
+    {
+      id: 'texto_adjunto',
+      indicatorId: 'a_inesperado',
+      label: 'Instrucción para abrir un adjunto',
+      explanation: 'Abre solo los archivos adjuntos que esperabas y puedas verificar.',
+      pattern: '\\b(abra|abre|descarga|descargue|open|download) (el |la |the )?(archivo adjunto|adjunto|attachment|attached file)\\b'
+    },
+    {
+      id: 'texto_macros',
+      indicatorId: 'a_macros',
+      label: 'Solicitud para habilitar macros o contenido',
+      explanation: 'Habilitar macros o contenido de un documento inesperado puede ejecutar acciones no deseadas.',
+      pattern: '\\b(habilita|habilite|enable) (las |los |el |la |the )?(macros|contenido|content)\\b'
+    },
+    {
+      id: 'texto_premio',
+      indicatorId: 'c_premio',
+      label: 'Premio o devolución inesperada',
+      explanation: 'Los premios o reembolsos inesperados pueden usarse para atraer a un enlace o pedir datos.',
+      pattern: '\\b(ganaste|ha ganado|has ganado|reclama tu premio|claim your prize|you (have )?won)\\b'
+    },
+    {
+      id: 'texto_secreto',
+      indicatorId: 'c_secreto',
+      label: 'Petición de mantenerlo en secreto',
+      explanation: 'Una petición de secreto puede intentar impedir que confirmes el mensaje con otra persona.',
+      pattern: "\\b(no (le )?digas a nadie|mantenga esto en secreto|keep this confidential|do not tell anyone|don't tell anyone|don’t tell anyone)\\b"
+    }
+  ];
+
   /** Lo que la persona ya hizo. No cambia el puntaje: cambia las acciones. */
   const EXPOSURES = [
     { id: 'x_clic', label: 'Hice clic en el enlace' },
@@ -205,7 +258,7 @@
   ];
 
   return {
-    GROUPS, INDICATORS, EXPOSURES, LEVELS, BRANDS, FREE_MAIL, SHORTENERS, HOSTING,
+    GROUPS, INDICATORS, TEXT_SIGNALS, EXPOSURES, LEVELS, BRANDS, FREE_MAIL, SHORTENERS, HOSTING,
     TRUSTED_SUFFIXES, RISKY_TLDS, MULTI_SUFFIXES, PATH_KEYWORDS, HOMOGLYPHS, FINDING_POINTS, CRITICAL_FINDINGS,
     RECOMMENDATIONS, EXPOSURE_ACTIONS
   };

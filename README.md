@@ -30,19 +30,20 @@ El personal recibe con frecuencia correos que suplantan a bancos, a la SUNAT, a 
 Dar a cada colaborador una forma rápida, guiada y uniforme de evaluar un correo sospechoso, obtener un nivel de riesgo explicable, saber exactamente qué hacer y enviar a TI un reporte completo y seguro.
 
 ### Solución propuesta
-Anzuelo guía a la persona en tres pasos: copiar los datos del correo (sin abrir el enlace), marcar las señales que observa e indicar si ya interactuó. La aplicación combina esas respuestas con una revisión automática del remitente y del enlace, calcula un puntaje de 0 a 100, asigna un nivel (Bajo, Medio, Alto o Crítico) y muestra las acciones a seguir. Todo ocurre en el navegador: ningún dato sale del equipo.
+Anzuelo guía a la persona: copiar los datos del correo (sin abrir el enlace), revisar las señales sugeridas en el texto, marcar manualmente lo que observa e indicar si ya interactuó. La aplicación combina esas respuestas con una revisión automática del remitente y del enlace, calcula un puntaje de 0 a 100, asigna un nivel (Bajo, Medio, Alto o Crítico) y muestra las acciones a seguir. Todo ocurre en el navegador: ningún dato sale del equipo.
 
 ## 2. Funcionalidades principales
 
 1. **Checklist guiado de 15 señales** en cuatro grupos (remitente, contenido, enlaces/QR, adjuntos), cada una con su peso visible.
-2. **Revisión automática del remitente:** detecta correos gratuitos, dominios que imitan marcas (BCP, Interbank, SUNAT, Microsoft, etc.) y nombres visibles que mencionan una marca desde otro dominio.
-3. **Revisión automática del enlace sin abrirlo:** IP en lugar de dominio, acortadores, caracteres especiales (punycode), uso de `@` para ocultar el destino, subdominios excesivos, puertos inusuales, hosting gratuito, extensiones riesgosas y typosquatting.
-4. **Protección contra fraude al proveedor / "fraude del CEO":** opcionalmente se registra el dominio de la organización y se detectan dominios que lo imitan.
-5. **Puntaje y nivel de riesgo explicables:** medidor visual, principales motivos y regla de señal crítica.
-6. **Acciones según el nivel y según la interacción:** si la persona ya hizo clic, ingresó credenciales o abrió un adjunto, aparecen primero las acciones urgentes.
-7. **Reporte para TI:** se copia o descarga como `.txt`, con enlaces y correos desactivados (`hxxp`, `[.]`, `[@]`) para evitar clics accidentales.
-8. **Historial local:** guarda hasta 50 evaluaciones en el navegador para volver a copiar un reporte o descargarlas como CSV UTF-8.
-9. **Accesible y adaptable:** navegación por teclado, lectores de pantalla, modo oscuro automático, diseño móvil con barra de resultado fija y tipografía de alta legibilidad.
+2. **Revisión orientativa del texto pegado:** busca frases explícitas en español e inglés sobre urgencia, credenciales, pagos, adjuntos, macros, premios y secreto. Muestra fragmentos y motivos para revisar; la persona confirma manualmente cualquier señal en el checklist. No altera el puntaje por sí sola.
+3. **Revisión automática del remitente:** detecta correos gratuitos, dominios que imitan marcas (BCP, Interbank, SUNAT, Microsoft, etc.) y nombres visibles que mencionan una marca desde otro dominio.
+4. **Revisión automática del enlace sin abrirlo:** IP en lugar de dominio, acortadores, caracteres especiales (punycode), uso de `@` para ocultar el destino, subdominios excesivos, puertos inusuales, hosting gratuito, extensiones riesgosas y typosquatting.
+5. **Protección contra fraude al proveedor / "fraude del CEO":** opcionalmente se registra el dominio de la organización y se detectan dominios que lo imitan.
+6. **Puntaje y nivel de riesgo explicables:** medidor visual, principales motivos y regla de señal crítica.
+7. **Acciones según el nivel y según la interacción:** si la persona ya hizo clic, ingresó credenciales o abrió un adjunto, aparecen primero las acciones urgentes.
+8. **Reporte para TI:** se copia o descarga como `.txt`, con enlaces y correos desactivados (`hxxp`, `[.]`, `[@]`) para evitar clics accidentales.
+9. **Historial local:** guarda hasta 50 evaluaciones en el navegador para volver a copiar un reporte o descargarlas como CSV UTF-8.
+10. **Accesible y adaptable:** navegación por teclado, lectores de pantalla, modo oscuro automático, diseño móvil con barra de resultado fija y tipografía de alta legibilidad.
 
 ## 3. Cómo se evalúa
 
@@ -50,6 +51,7 @@ Anzuelo guía a la persona en tres pasos: copiar los datos del correo (sin abrir
 |---|---|
 | Señales observadas | Cada una suma entre 5 y 30 puntos. |
 | Revisión automática | Cada hallazgo suma entre 5 y 30 puntos. |
+| Texto pegado | Sugiere señales con frases coincidentes, pero no suma puntos hasta que la persona confirme manualmente en el checklist. |
 | Puntaje | Suma total, con tope de 100. |
 | Niveles | Bajo: 0-19. Medio: 20-44. Alto: 45-69. Crítico: 70-100. |
 | Señal crítica | Pedir credenciales o pagos, adjuntos ejecutables, macros o un dominio que imita una marca elevan el nivel a **Alto como mínimo**, aunque el puntaje sea menor. |
@@ -59,7 +61,8 @@ Anzuelo guía a la persona en tres pasos: copiar los datos del correo (sin abrir
 - La regla de señal crítica evita que un correo que solo pide la contraseña quede en "Medio" por sumar pocos puntos.
 - "Errores de redacción" pesa solo 5 puntos porque, con IA generativa, muchos correos falsos ya no tienen errores (CISA).
 - Se separa probabilidad (puntaje) de impacto (interacción) para no confundir "qué tan falso parece" con "qué tan urgente es actuar".
-- Los pesos, marcas y listas viven en `assets/js/criteria.js` y se ajustan sin tocar la lógica.
+- Los pesos, marcas, listas y patrones de texto viven en `assets/js/criteria.js` y se ajustan sin tocar la lógica.
+- El análisis del texto se limita a los primeros 20 000 caracteres y usa reglas explícitas; no entiende el contexto completo y puede equivocarse.
 
 Fundamento de las señales: [INCIBE, guía para identificar correos fraudulentos](https://www.incibe.es/empresas/blog/busca-otro-al-enganar-yo-no-voy-picar) y [CISA, Recognize and Report Phishing](https://www.cisa.gov/secure-our-world/recognize-and-report-phishing).
 
@@ -72,7 +75,7 @@ anzuelo/
 │   ├── css/styles.css          Estilos (tokens de color, modo oscuro, responsive)
 │   ├── fonts/                  Atkinson Hyperlegible Next (auto-alojada, OFL)
 │   └── js/
-│       ├── criteria.js         Datos: señales, pesos, marcas, listas, recomendaciones
+│       ├── criteria.js         Datos: señales, pesos, marcas, listas, recomendaciones y patrones de texto
 │       ├── analyzer.js         Motor: análisis, puntaje, reportes y formato CSV (funciones puras)
 │       ├── storage.js          Historial en localStorage con respaldo en memoria
 │       └── app.js              Interfaz: eventos y renderizado
@@ -127,19 +130,20 @@ Se usó **GitHub Copilot Free**; se omitió la revisión automática de pull req
 ## 8. Seguridad y privacidad
 
 - **Sin conexión a servidores:** la política de seguridad de contenido (`connect-src 'none'`) impide cualquier petición de red desde la página. No hay analítica, CDN ni fuentes externas.
-- **Sin inyección de HTML:** todo el texto del usuario se inserta con `textContent`.
+- **Sin inyección de HTML:** todo el texto del usuario, incluidos los fragmentos detectados, se inserta con `textContent`.
 - **Enlaces desactivados** en reportes, historial y exportaciones CSV.
 - **Datos locales:** el historial y el dominio de la organización se guardan solo en `localStorage` del navegador.
+- **Texto del mensaje:** se analiza solo en memoria, hasta 20 000 caracteres; no se guarda en el historial ni se incluye en reportes.
 
 ## 9. Limitaciones
 
 - Es una herramienta heurística de apoyo; no reemplaza al equipo de seguridad. Puede haber falsos positivos y falsos negativos.
+- Las sugerencias sobre el cuerpo del mensaje reconocen frases concretas, no el contexto ni la intención; confirma cada señal antes de marcarla.
 - No analiza cabeceras del correo (SPF, DKIM, DMARC) ni consulta listas de reputación en línea; esto es intencional para no enviar datos fuera del navegador.
 - Las listas de marcas, acortadores y extensiones son estáticas y deben mantenerse.
 
 ## 10. Trabajo futuro
 
-- Detectar señales en el texto pegado del correo.
 - Modo de práctica con correos de entrenamiento.
 
 ## 11. Declaración de uso de IA

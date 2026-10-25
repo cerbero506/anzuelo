@@ -309,6 +309,73 @@
     return { valid: true, display, email, domain, findings };
   }
 
+  /* ---------- Revisión orientativa del texto ---------- */
+
+  const MAX_MESSAGE_LENGTH = 20000;
+
+  function normalizeMessage(text) {
+    let normalized = '';
+    const starts = [];
+    const ends = [];
+
+    for (let index = 0; index < text.length;) {
+      const start = index;
+      const character = String.fromCodePoint(text.codePointAt(index));
+      index += character.length;
+      const clean = character.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      normalized += clean;
+      for (let i = 0; i < clean.length; i++) {
+        starts.push(start);
+        ends.push(index);
+      }
+    }
+
+    return { text: normalized, starts, ends };
+  }
+
+  function messageExcerpt(text, start, end) {
+    const maxLength = 120;
+    const matchLength = end - start;
+    const context = Math.max(0, Math.floor((maxLength - matchLength) / 2));
+    let from = Math.max(0, start - context);
+    let to = Math.min(text.length, from + maxLength);
+    from = Math.max(0, to - maxLength);
+    return `${from ? '…' : ''}${text.slice(from, to)}${to < text.length ? '…' : ''}`;
+  }
+
+  /**
+   * Busca frases explícitas en el cuerpo de un correo. Los hallazgos son orientativos
+   * y no se incorporan al puntaje ni seleccionan indicadores.
+   * @param {string} raw Texto del mensaje.
+   * @returns {{truncated: boolean, findings: Array}}
+   */
+  function analyzeMessage(raw) {
+    const text = String(raw || '');
+    const truncated = text.length > MAX_MESSAGE_LENGTH;
+    let source = text.slice(0, MAX_MESSAGE_LENGTH);
+    if (source.length && /[\uD800-\uDBFF]/.test(source.slice(-1))) source = source.slice(0, -1);
+    const normalized = normalizeMessage(source);
+    const findings = [];
+
+    for (const signal of C.TEXT_SIGNALS) {
+      const match = new RegExp(signal.pattern).exec(normalized.text);
+      if (!match || !match[0].length) continue;
+      const start = normalized.starts[match.index];
+      const end = normalized.ends[match.index + match[0].length - 1];
+      const indicator = C.INDICATORS.find((item) => item.id === signal.indicatorId);
+      findings.push({
+        id: signal.id,
+        indicatorId: signal.indicatorId,
+        indicatorLabel: indicator.label,
+        label: signal.label,
+        explanation: signal.explanation,
+        excerpt: messageExcerpt(source, start, end)
+      });
+    }
+
+    return { truncated, findings };
+  }
+
   /* ---------- Puntaje y nivel ---------- */
 
   function levelFor(score) {
@@ -465,7 +532,7 @@
 
   return {
     normalizeDomain, isIp, registrableDomain, mainLabel, matchesDomain, levenshtein, deglyph,
-    detectLookalike, brandList, parseSender, analyzeUrl, analyzeSender, levelFor, evaluate,
+    detectLookalike, brandList, parseSender, analyzeUrl, analyzeSender, analyzeMessage, levelFor, evaluate,
     defangUrl, defangEmail, formatDate, buildHistoryCsv, buildReport
   };
 });

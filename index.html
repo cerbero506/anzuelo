@@ -68,6 +68,20 @@
             <p id="org-help" class="field__help">Detecta dominios que imitan al de tu empresa, típicos del fraude al proveedor o “fraude del CEO”. Se recuerda en este navegador.</p>
           </details>
 
+          <div class="field">
+            <label for="messageBody">Texto del mensaje <span class="optional">opcional</span></label>
+            <textarea id="messageBody" name="messageBody" rows="7" autocomplete="off" spellcheck="false" aria-describedby="message-help" placeholder="Pega aquí el cuerpo del correo sospechoso"></textarea>
+            <p id="message-help" class="field__help">Se revisa solo en este navegador, hasta 20 000 caracteres. No guardes aquí datos que no quieras mostrar en pantalla.</p>
+          </div>
+          <section class="message-review" aria-labelledby="message-review-title">
+            <h3 id="message-review-title">Señales para revisar en el texto</h3>
+            <p class="field__help">Son indicios orientativos: pueden equivocarse y no determinan el puntaje. Confirma manualmente en el checklist solo las señales que observes.</p>
+            <div id="messageReview" aria-live="polite" aria-atomic="false" aria-relevant="additions text">
+              <p id="messageStatus" class="empty"></p>
+              <ul id="messageFindings" class="text-findings"></ul>
+            </div>
+          </section>
+
           <button type="button" id="loadExample" class="btn btn--quiet">Cargar un ejemplo</button>
 
           <div class="auto">
