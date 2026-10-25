@@ -1,5 +1,5 @@
 /**
- * Anzuelo: motor de evaluación (funciones puras, sin acceso al DOM).
+ * Anzuelo: lógica de análisis y reportes, sin acceso al DOM.
  * Todo se calcula localmente; no hace peticiones de red.
  * Funciona en el navegador (window.Anzuelo) y en Node (require) para las pruebas.
  */
@@ -14,12 +14,12 @@
 
   /* ---------- Utilidades de dominio ---------- */
 
-  /** Normaliza un dominio: minúsculas, sin espacios ni punto final. */
+  /** Recorta espacios exteriores, pasa a minúsculas y quita www inicial y punto final. */
   function normalizeDomain(domain) {
     return String(domain || '').trim().toLowerCase().replace(/^www\./, '').replace(/\.$/, '');
   }
 
-  /** true si el host es una dirección IP (v4 o v6). */
+  /** Detecta IPv4 numérica o un host que comienza con "[" (formato IPv6); no valida la dirección. */
   function isIp(host) {
     return /^\d{1,3}(\.\d{1,3}){3}$/.test(host) || host.startsWith('[');
   }
@@ -70,7 +70,7 @@
     return out.replace(/-/g, '');
   }
 
-  /** Lista de marcas más el dominio de la organización, si se indicó. */
+  /** Lista de marcas más el dominio de la organización, si se indicó con un punto. */
   function brandList(orgDomain) {
     const org = normalizeDomain(orgDomain);
     const list = C.BRANDS.slice();
@@ -100,7 +100,8 @@
    * Reglas:
    *  1. Una palabra clave de la marca aparece en alguna parte del host (tras quitar homoglifos).
    *     Palabras de 3 letras o menos (ej. "upc", "dhl") solo cuentan como palabra completa.
-   *  2. La etiqueta principal difiere de la palabra clave en 1-2 letras (typosquatting).
+   *  2. La etiqueta principal difiere de la palabra clave en 1 letra (6-7 caracteres)
+   *     o 1-2 letras (8 o más caracteres).
    * @returns {null | {brand: string, official: string, isOrg: boolean}}
    */
   function detectLookalike(host, brands) {
@@ -151,7 +152,7 @@
    * Analiza un enlace copiado del correo (nunca lo abre).
    * @param {string} raw Texto del enlace.
    * @param {{orgDomain?: string}} [ctx]
-   * @returns {null | {valid: boolean, host?: string, findings: Array}}
+   * @returns {null | ({valid: false, findings: Array<{id: string, label: string, points: number, critical: boolean, kind: string}>} | {valid: true, host: string, registrable?: string, findings: Array<{id: string, label: string, points: number, critical: boolean, kind: string}>})}
    */
   function analyzeUrl(raw, ctx) {
     const text = String(raw || '').trim();
@@ -253,6 +254,7 @@
    * Analiza la dirección del remitente.
    * @param {string} raw Remitente tal como se ve en el correo.
    * @param {{orgDomain?: string}} [ctx]
+   * @returns {null | ({valid: false, display: string, email: string, findings: Array<{id: string, label: string, points: number, critical: boolean, kind: string}>} | {valid: true, display: string, email: string, domain: string, findings: Array<{id: string, label: string, points: number, critical: boolean, kind: string}>})}
    */
   function analyzeSender(raw, ctx) {
     const text = String(raw || '').trim();
@@ -347,7 +349,7 @@
    * Busca frases explícitas en el cuerpo de un correo. Los hallazgos son orientativos
    * y no se incorporan al puntaje ni seleccionan indicadores.
    * @param {string} raw Texto del mensaje.
-   * @returns {{truncated: boolean, findings: Array}}
+   * @returns {{truncated: boolean, findings: Array<{id: string, indicatorId: string, indicatorLabel: string, label: string, explanation: string, excerpt: string}>}}
    */
   function analyzeMessage(raw) {
     const text = String(raw || '');
@@ -391,6 +393,7 @@
   /**
    * Evalúa un correo.
    * @param {{indicators?: string[], url?: string, sender?: string, orgDomain?: string, exposures?: string[]}} input
+   * @returns {{hasData: boolean, score: number, rawScore: number, level: {key: string, label: string}, floored: boolean, criticalReasons: Array<{id: string, label: string, points: number, critical: boolean, source: string, origin?: string}>, reasons: Array<{id: string, label: string, points: number, critical: boolean, source: string, origin?: string}>, summary: string, steps: string[], exposureActions: string[], exposures: string[], url: ReturnType<typeof analyzeUrl>, sender: ReturnType<typeof analyzeSender>}}
    */
   function evaluate(input) {
     const ids = new Set(input.indicators || []);
@@ -491,7 +494,7 @@
   /**
    * Construye el reporte en texto plano para enviar a TI.
    * @param {ReturnType<typeof evaluate>} result
-   * @param {{subject?: string, sender?: string, url?: string, date?: Date}} meta
+   * @param {{subject?: string, sender?: string, url?: string, date?: Date|string}} [meta]
    */
   function buildReport(result, meta) {
     const m = meta || {};

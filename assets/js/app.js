@@ -201,22 +201,31 @@
     list.replaceChildren(...items.map(build));
   }
 
-  function renderResult(result) {
+  function renderResultSummary(result) {
     const has = result.hasData;
     ui.card.dataset.level = has ? result.level.key : 'none';
     ui.needle.style.left = `${has ? result.score : 0}%`;
     ui.levelLabel.textContent = has ? result.level.label : 'Sin evaluar';
     ui.scoreLabel.textContent = has ? `${result.score} de 100` : '';
     ui.summary.textContent = has ? result.summary : EMPTY_SUMMARY;
+  }
 
+  function renderFloorNote(result) {
+    const has = result.hasData;
     ui.floorNote.hidden = !(has && result.floored);
     if (has && result.floored) {
       ui.floorNote.textContent = `El nivel subió a Alto por una señal crítica: ${lowerFirst(result.criticalReasons[0].label)}.`;
     }
+  }
 
+  function renderExposureActions(result) {
+    const has = result.hasData;
     ui.exposureBlock.hidden = !(has && result.exposureActions.length);
     fillList(ui.exposureActions, result.exposureActions, (t) => el('li', null, t));
+  }
 
+  function renderReasons(result) {
+    const has = result.hasData;
     const top = result.reasons.slice(0, 5);
     ui.reasonsBlock.hidden = !(has && top.length);
     fillList(ui.reasons, top, (r) => {
@@ -225,16 +234,35 @@
       li.append(el('span', null, text), el('span', { class: 'reason__pts' }, `+${r.points}`));
       return li;
     });
+  }
 
+  function renderRecommendedSteps(result) {
+    const has = result.hasData;
     ui.stepsBlock.hidden = !has;
     fillList(ui.steps, has ? result.steps : [], (t) => el('li', null, t));
+  }
 
+  function updateResultActions(result) {
+    const has = result.hasData;
     for (const btn of [ui.copyReport, ui.downloadReport, ui.saveEval]) btn.disabled = !has;
+  }
 
+  function announceResult(result) {
+    const has = result.hasData;
     clearTimeout(srTimer);
     srTimer = setTimeout(() => {
       ui.srStatus.textContent = has ? `Nivel ${result.level.label}, ${result.score} de 100.` : '';
     }, 700);
+  }
+
+  function renderResult(result) {
+    renderResultSummary(result);
+    renderFloorNote(result);
+    renderExposureActions(result);
+    renderReasons(result);
+    renderRecommendedSteps(result);
+    updateResultActions(result);
+    announceResult(result);
   }
 
   function renderMobileBar() {

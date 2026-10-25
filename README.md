@@ -71,18 +71,28 @@ Fundamento de las señales: [INCIBE, guía para identificar correos fraudulentos
 ```
 anzuelo/
 ├── index.html                  Estructura de la interfaz
+├── package.json                Scripts de prueba y servidor local
+├── LICENSE                     Licencia MIT
+├── .gitignore                  Archivos excluidos de Git
+├── .github/
+│   ├── copilot-instructions.md Instrucciones del agente para este repositorio
+│   └── workflows/
+│       └── pages.yml           Pruebas y despliegue en GitHub Pages
 ├── assets/
-│   ├── css/styles.css          Estilos (tokens de color, modo oscuro, responsive)
-│   ├── fonts/                  Atkinson Hyperlegible Next (auto-alojada, OFL)
+│   ├── css/
+│   │   └── styles.css          Estilos (tokens de color, modo oscuro, responsive)
+│   ├── fonts/                  Atkinson Hyperlegible Next y licencia OFL
 │   └── js/
 │       ├── criteria.js         Datos: señales, pesos, marcas, listas, recomendaciones y patrones de texto
-│       ├── analyzer.js         Motor: análisis, puntaje, reportes y formato CSV (funciones puras)
+│       ├── analyzer.js         Lógica: análisis, puntaje, reportes y formato CSV
 │       ├── storage.js          Historial en localStorage con respaldo en memoria
 │       └── app.js              Interfaz: eventos y renderizado
-├── tests/analyzer.test.js      Pruebas del motor y del CSV (node:test, sin dependencias)
-├── .github/workflows/pages.yml Pruebas + despliegue en GitHub Pages
+├── tests/
+│   └── analyzer.test.js        Pruebas del motor y del CSV (node:test, sin dependencias)
 ├── COPILOT.md                  Uso de GitHub Copilot: pasos del workshop y bitácora de evidencia
-└── docs/                       Guion del video y capturas de evidencia
+└── docs/
+    ├── guion-video.md          Guion del video
+    └── capturas/               Capturas de evidencia
 ```
 
 Arquitectura: sitio estático en HTML, CSS y JavaScript sin frameworks ni dependencias en tiempo de ejecución, como propone el workshop *Copilot App*. El motor (`analyzer.js`) no toca el DOM, lo que permite probarlo con Node.
