@@ -116,9 +116,67 @@ test('sin datos no hay evaluación', () => {
 test('el reporte desactiva enlaces y correos', () => {
   assert.equal(A.defangUrl('https://viabcp-alertas.com/login'), 'hxxps://viabcp-alertas[.]com/login');
   assert.equal(A.defangEmail('BCP <a@b.com.pe>'), 'BCP <a[@]b[.]com[.]pe>');
+  assert.equal(A.defangUrl('hxxps://viabcp-alertas[.]com/login'), 'hxxps://viabcp-alertas[.]com/login');
+  assert.equal(A.defangEmail('BCP <a[@]b[.]com[.]pe>'), 'BCP <a[@]b[.]com[.]pe>');
   const r = A.evaluate({ url: 'http://viabcp-alertas.com/login', indicators: ['c_urgencia'] });
   const report = A.buildReport(r, { subject: 'Prueba', sender: 'x@viabcp-alertas.com', url: 'http://viabcp-alertas.com/login', date: new Date(2026, 9, 25, 9, 5) });
   assert.match(report, /Fecha de evaluación: 25\/10\/2026 09:05/);
   assert.match(report, /hxxp:\/\/viabcp-alertas\[\.\]com\/login/);
   assert.doesNotMatch(report, /https?:\/\/viabcp/);
+});
+
+test('exporta el historial como CSV UTF-8, escapando campos y desactivando enlaces', () => {
+  const csv = A.buildHistoryCsv([{
+    date: new Date(2026, 9, 25, 9, 5),
+    subject: 'Revisión, "urgente"\ny confirmar',
+    sender: 'Ana <ana@ejemplo.com>',
+    url: 'https://ejemplo.com/verificar',
+    score: 45,
+    levelLabel: 'Alto',
+    exposed: true
+  }]);
+
+  assert.equal(csv.charCodeAt(0), 0xFEFF);
+  assert.match(csv, /"Fecha","Asunto","Remitente","Enlace","Puntaje \(sobre 100\)","Nivel de riesgo","Hubo interacción"/);
+  assert.ok(csv.includes('"25/10/2026 09:05","Revisión, ""urgente""\ny confirmar","Ana <ana[@]ejemplo[.]com>","hxxps://ejemplo[.]com/verificar","45","Alto","Sí"'));
+  assert.doesNotMatch(csv, /https?:\/\/ejemplo/);
+
+  const savedCsv = A.buildHistoryCsv([{
+    date: new Date(2026, 9, 25, 9, 5),
+    subject: 'Prueba',
+    sender: 'Ana <ana[@]ejemplo[.]com>',
+    url: 'hxxps://ejemplo[.]com/verificar',
+    score: 45,
+    levelLabel: 'Alto',
+    exposed: true
+  }]);
+  assert.ok(savedCsv.includes('"Ana <ana[@]ejemplo[.]com>","hxxps://ejemplo[.]com/verificar"'));
+});
+
+test('exporta asunto y remitente ausentes de forma coherente con el historial', () => {
+  const csv = A.buildHistoryCsv([{
+    date: new Date(2026, 9, 25, 9, 5),
+    subject: '',
+    sender: '',
+    score: 0,
+    levelLabel: 'Bajo',
+    exposed: false
+  }]);
+
+  assert.match(csv, /"\(sin asunto\)","","","0","Bajo","No"/);
+});
+
+test('neutraliza fórmulas de hoja de cálculo en celdas CSV', () => {
+  const csv = A.buildHistoryCsv(['=', '+', '-', '@'].map((prefix, index) => ({
+    date: new Date(2026, 9, 25, 9, 5),
+    subject: `${prefix}2+2`,
+    sender: '',
+    score: index,
+    levelLabel: 'Bajo',
+    exposed: false
+  })));
+
+  for (const formula of ["'=2+2", "'+2+2", "'-2+2", "'@2+2"]) {
+    assert.ok(csv.includes(`"${formula}"`), `debe proteger ${formula}`);
+  }
 });

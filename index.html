@@ -153,9 +153,12 @@
       <div class="history__head">
         <div>
           <h2 id="history-title">Historial</h2>
-          <p class="history__note">Se guarda solo en este navegador. Los remitentes aparecen desactivados para evitar clics.</p>
+          <p class="history__note">Se guarda solo en este navegador. Los remitentes y enlaces aparecen desactivados para evitar clics.</p>
         </div>
-        <button type="button" class="btn btn--quiet" id="clearHistory" hidden>Borrar historial</button>
+        <div>
+          <button type="button" class="btn btn--quiet" id="downloadHistory" hidden>Descargar CSV</button>
+          <button type="button" class="btn btn--quiet" id="clearHistory" hidden>Borrar historial</button>
+        </div>
       </div>
       <ul class="history__list" id="historyList"></ul>
       <p class="empty" id="historyEmpty">Aún no guardaste evaluaciones. Usa “Guardar en el historial” para llevar un registro de lo que reportaste.</p>

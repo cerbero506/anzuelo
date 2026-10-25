@@ -52,6 +52,7 @@
     historyList: $('historyList'),
     historyEmpty: $('historyEmpty'),
     historyCount: $('historyCount'),
+    downloadHistory: $('downloadHistory'),
     clearHistory: $('clearHistory'),
     mobileBar: $('mobileBar'),
     mobileText: $('mobileText'),
@@ -264,6 +265,7 @@
       date: meta.date.toISOString(),
       subject: meta.subject.trim(),
       sender: A.defangEmail(meta.sender),
+      url: A.defangUrl(meta.url),
       score: current.score,
       levelKey: current.level.key,
       levelLabel: current.level.label,
@@ -305,6 +307,7 @@
     const items = S.list();
     ui.historyCount.textContent = String(items.length);
     ui.historyEmpty.hidden = items.length > 0;
+    ui.downloadHistory.hidden = items.length === 0;
     ui.clearHistory.hidden = items.length === 0;
     ui.historyList.replaceChildren(...items.map((item) => {
       const li = el('li', { class: 'hitem', 'data-level': item.levelKey });
@@ -316,6 +319,7 @@
       const meta = el('p', { class: 'hitem__meta' });
       const parts = [A.formatDate(item.date), `${item.score} de 100`];
       if (item.sender) parts.push(item.sender);
+      if (item.url) parts.push(`Enlace: ${item.url}`);
       if (item.exposed) parts.push('hubo interacción');
       meta.textContent = parts.join(', ');
       const actions = el('div', { class: 'hitem__actions' });
@@ -325,6 +329,19 @@
       li.append(main, meta, actions);
       return li;
     }));
+  }
+
+  function onDownloadHistory() {
+    const items = S.list();
+    if (!items.length) return;
+    const blob = new Blob([A.buildHistoryCsv(items)], { type: 'text/csv;charset=utf-8' });
+    const href = URL.createObjectURL(blob);
+    const link = el('a', { href, download: `historial-anzuelo-${stamp(new Date())}.csv` });
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(href), 1000);
+    toast('Historial descargado en CSV.');
   }
 
   function onHistoryClick(event) {
@@ -384,6 +401,7 @@
     $('resetForm').addEventListener('click', onReset);
     $('loadExample').addEventListener('click', onExample);
     ui.historyList.addEventListener('click', onHistoryClick);
+    ui.downloadHistory.addEventListener('click', onDownloadHistory);
     ui.clearHistory.addEventListener('click', onClearHistory);
 
     watchResultVisibility();
